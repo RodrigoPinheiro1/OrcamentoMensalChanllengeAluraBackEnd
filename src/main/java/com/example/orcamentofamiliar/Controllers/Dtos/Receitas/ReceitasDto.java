@@ -17,8 +17,6 @@ import java.util.Optional;
 @Getter
 public class ReceitasDto {
 
-
-
     private String descricao;
 
     private BigDecimal valor;
