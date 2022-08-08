@@ -20,9 +20,7 @@ import java.net.URISyntaxException;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ExtendWith(SpringExtension.class)
 @AutoConfigureMockMvc
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
 class ReceitaControllerTest {
 
@@ -83,7 +81,7 @@ class ReceitaControllerTest {
 
     }
     @Test
-    void deveriaDevolver409CadastroComMesmaDescricaoEDataMesmoMes() throws Exception {
+    void deveriaDevolverConlflictAtualizacaoComMesmaDescricaoEDataMesmoMes() throws Exception {
 
         URI uri = new URI("/receitas/1");
         String json = "{\"descricao\":\"descricaoAtu\", \"valor\":\"18\",\"data\":\"2022-02-20\"}";
@@ -96,14 +94,45 @@ class ReceitaControllerTest {
     }
 
     @Test
-    void buscarPorId() {
+    void deveriaDesevolverNotFoundComIdInvalido() throws Exception {
+
+        URI uri = new URI("/receitas/8");
+
+        mockMvc.perform(MockMvcRequestBuilders.get(uri))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+    @Test
+    void deveriaBuscarPeloIdEDevolver200PassandoIdCorreto() throws Exception {
+
+        URI uri = new URI("/receitas/2");
+
+        mockMvc.perform(MockMvcRequestBuilders.get(uri))
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
     void listarTudoOuNome() {
+
+
+
+
     }
 
     @Test
-    void apaga() {
+    void deveriaDevolver404AoDeletar() throws Exception {
+        URI uri = new URI("/receitas/654");
+
+        mockMvc.perform(MockMvcRequestBuilders.delete(uri))
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
+
+    }
+
+    @Test
+    void deveriaDevolver200AoDeletar() throws Exception {
+        URI uri = new URI("/receitas/2");
+
+        mockMvc.perform(MockMvcRequestBuilders.delete(uri))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+
     }
 }
