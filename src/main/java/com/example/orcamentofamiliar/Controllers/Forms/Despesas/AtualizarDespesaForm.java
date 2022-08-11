@@ -1,6 +1,7 @@
 package com.example.orcamentofamiliar.Controllers.Forms.Despesas;
 
 
+import com.example.orcamentofamiliar.Entidades.Categorias;
 import com.example.orcamentofamiliar.Entidades.Despesas;
 import com.example.orcamentofamiliar.Entidades.Receitas;
 import com.example.orcamentofamiliar.Repository.DespesasRepository;
@@ -26,6 +27,9 @@ public class AtualizarDespesaForm {
     @NotNull
     private LocalDate data;
 
+    private Categorias categorias;
+
+
 
 
     public Despesas atualizar(DespesasRepository despesasRepository, Long id) {
@@ -34,6 +38,7 @@ public class AtualizarDespesaForm {
         despesas.setDescricao(descricao);
         despesas.setValor(valor);
         despesas.setData(data);
+        despesas.setCategorias(categorias);
 
         return despesas;
     }
@@ -46,7 +51,7 @@ public class AtualizarDespesaForm {
         Optional<Despesas> receitas = despesasRepository.findByDescricaoAndDataBetween(descricao,firstDay,lastDay);
 
 
-        if (receitas.isPresent()){
+        if (receitas.isPresent() ){
             return true;
         }
         return false;

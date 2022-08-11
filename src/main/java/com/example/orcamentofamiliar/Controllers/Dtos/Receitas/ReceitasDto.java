@@ -4,14 +4,9 @@ import com.example.orcamentofamiliar.Entidades.Receitas;
 import com.example.orcamentofamiliar.Repository.ReceitasRepository;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
 import java.util.Optional;
 
 @Getter
@@ -21,8 +16,9 @@ public class ReceitasDto {
 
     private BigDecimal valor;
 
-    @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private LocalDate data;
+    private  LocalDate data;
+
+
 
 
     public ReceitasDto(Receitas receitas) {
@@ -36,6 +32,7 @@ public class ReceitasDto {
         return receitas.map(ReceitasDto::new);
 
     }
+
 
 
 }

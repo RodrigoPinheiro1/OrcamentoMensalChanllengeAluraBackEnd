@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.Month;
 import java.util.Optional;
 
 @Repository
@@ -19,7 +19,16 @@ public interface ReceitasRepository extends JpaRepository <Receitas,Long> {
 
 
    Optional <Receitas> findByDescricaoAndDataBetween(String desc, LocalDate inicioMes, LocalDate fimMes);
+    @Query("select r from Receitas r where MONTH(r.data) = ?1 and YEAR(r.data) = ?2")
+   Page<Receitas> acharDataEMes(int month, int year, Pageable pageable);
 
 
+    @Query("select r from Receitas r where MONTH(r.data) = ?1 and YEAR(r.data) = ?2")
+    Optional<Receitas> acharDataEMes(int month, int year);
+
+
+    @Query (value = "select sum(r.valor) from Receitas r " +
+            "where r.data BETWEEN :firstDay AND :lastDay")
+    Optional<BigDecimal> calcularValor (@Param("firstDay") LocalDate firstDay, @Param("lastDay") LocalDate lastDay);
 
 }

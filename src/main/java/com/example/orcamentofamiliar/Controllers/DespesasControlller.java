@@ -17,7 +17,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-import java.lang.management.LockInfo;
 import java.net.URI;
 import java.util.Optional;
 
@@ -61,6 +60,16 @@ public class DespesasControlller {
         }
         return ResponseEntity.notFound().build();
 
+    }
+    @GetMapping("/{mes}/{ano}")
+    public Page<DespesasDto> listarPorData  (@PathVariable int mes , @PathVariable int ano ,
+                                             @PageableDefault(sort = "data"  ,direction = Sort.Direction.ASC
+                                             ,page = 0, size = 10) Pageable pageable){
+
+
+        Page<Despesas> despesas = despesasRepository.acharPorMesEAno(mes, ano, pageable);
+
+        return DespesasDto.converter(despesas);
     }
 
     @GetMapping

@@ -12,29 +12,20 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-public class Receitas {
+public class Receitas  {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String descricao;
     private BigDecimal valor;
     private LocalDate data;
 
-    @ManyToMany
-    private List<Despesas> despesas = new ArrayList<>();
-
-
-
     public Receitas() {
     }
 
-    public Receitas(Long id, String descricao, BigDecimal valor, LocalDate data) {
-        this.id = id;
-        this.descricao = descricao;
-        this.valor = valor;
-        this.data = data;
-    }
+
 
     public Receitas(String descricao, BigDecimal valor, LocalDate data) {
         this.descricao = descricao;
@@ -42,8 +33,5 @@ public class Receitas {
         this.data = data;
     }
 
-    public Receitas(String descricao, BigDecimal valor) {
-        this.descricao = descricao;
-        this.valor = valor;
-    }
+
 }

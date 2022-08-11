@@ -12,7 +12,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -73,7 +72,7 @@ public class ReceitaController {
 
     @GetMapping
     public Page<ReceitasDto> listarTudoOuNome (@RequestParam (required = false) String descricao,
-                                                       @PageableDefault (sort = "id", direction = Sort.Direction.DESC,
+                                               @PageableDefault (sort = "id", direction = Sort.Direction.DESC,
                                                        page = 0, size = 10) Pageable page){
 
         if (descricao == null) {
@@ -84,6 +83,16 @@ public class ReceitaController {
         return ReceitasDto.converter(receitas);
     }
 
+
+    @GetMapping("/{mes}/{ano}")
+    public Page<ReceitasDto> listarPorAnoEMes(@PathVariable int  ano  , @PathVariable int mes,
+                                              @PageableDefault (sort = "data",direction = Sort.Direction.ASC,
+                                              page = 0, size = 10) Pageable pageable){
+
+        Page<Receitas> receitas = receitasRepository.acharDataEMes(mes,ano,pageable);
+
+        return  ReceitasDto.converter(receitas);
+    }
 
 
     @DeleteMapping("/{id}")

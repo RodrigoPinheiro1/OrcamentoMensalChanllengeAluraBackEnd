@@ -38,7 +38,8 @@ public class AtualizarReceitaForm {
 
         return receitas;
     }
-    public  Boolean verifica(ReceitasRepository receitasRepository) {
+    public  Boolean
+    verifica(ReceitasRepository receitasRepository) {
 
         LocalDate firstDay = data.with(TemporalAdjusters.firstDayOfMonth());
         LocalDate lastDay = data.with(TemporalAdjusters.lastDayOfMonth());
