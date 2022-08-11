@@ -23,14 +23,6 @@ public class ResumoDto {
         this.categoria = categoria;
     }
 
-    public ResumoDto(BigDecimal valorTotalReceita, BigDecimal valorTotalDespesas) {
-        this.valorReceita = valorTotalReceita;
-        this.valorDespesas = valorTotalDespesas;
-        this.saldo = valorTotalReceita.subtract(valorTotalDespesas);
-
-    }
-
-
     public ResumoDto() {
 
     }

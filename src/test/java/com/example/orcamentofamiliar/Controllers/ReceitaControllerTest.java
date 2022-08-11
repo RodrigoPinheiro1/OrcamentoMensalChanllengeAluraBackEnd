@@ -114,10 +114,7 @@ class ReceitaControllerTest {
     void listarTudoOuNome() {
 
 
-
-
     }
-
     @Test
     void deveriaDevolver404AoDeletar() throws Exception {
         URI uri = new URI("/receitas/654");
