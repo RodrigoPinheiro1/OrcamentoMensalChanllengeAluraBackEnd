@@ -5,6 +5,8 @@ import com.example.orcamentofamiliar.Entidades.Despesas;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
 
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -17,6 +19,7 @@ public class DespesasDto {
 
     private LocalDate data;
 
+    @Enumerated(EnumType.STRING)
     private Categorias categorias;
 
 

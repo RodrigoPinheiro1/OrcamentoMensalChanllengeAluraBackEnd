@@ -1,14 +1,18 @@
 package com.example.orcamentofamiliar.Repository;
 
+import com.example.orcamentofamiliar.Controllers.Dtos.CategoriasDto;
+import com.example.orcamentofamiliar.Entidades.Categorias;
 import com.example.orcamentofamiliar.Entidades.Despesas;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -20,9 +24,14 @@ public interface DespesasRepository  extends JpaRepository<Despesas,Long> {
       @Query("select d from Despesas d where MONTH(d.data) = ?1 and YEAR(d.data) = ?2")
     Page<Despesas> acharPorMesEAno(int month, int year, Pageable pageable);
 
-   /* @Query("SELECT SUM(r.valor) " + "FROM Despesas r "
-            + "WHERE r.categorias = :categorias "+ " AND r.data BETWEEN :firstDay AND :lastDay")
-    Optional<BigDecimal> calcularValor (int mes, int ano, LocalDate firstDay, LocalDate lastDay);
-*/
+
+    @Query (value = "select sum(r.valor) from Despesas r " +
+            "where r.data BETWEEN :firstDay AND :lastDay")
+    Optional<BigDecimal> calcularValor (@Param("firstDay") LocalDate firstDay, @Param("lastDay") LocalDate lastDay);
+
+    @Query (value = "select new  com.example.orcamentofamiliar.Controllers.Dtos.CategoriasDto(d.categorias,d.valor) from Despesas d " +
+            "where d.data  between :firstDay AND :lastDay")
+    List<CategoriasDto> acharValorCategorias (@Param("firstDay") LocalDate firstDay, @Param("lastDay") LocalDate lastDay);
+
 }
 
