@@ -24,11 +24,12 @@ class ResumoControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
     @Test
-    void DeveriaDevolver200PassandoInformações() throws Exception {
-        URI uri  = new URI("/resumo/2022/08");
+    void DeveriaDevolver200PassandoInformaçõesCorretas() throws Exception {
+        URI uri = new URI("/resumo/2022/08");
 
         mockMvc.perform(MockMvcRequestBuilders.get(uri)).andExpect(MockMvcResultMatchers.status().isOk());
-
     }
+
 }
