@@ -16,7 +16,8 @@ public class DevSecutiryConfigurations {
 
     @Bean
     protected SecurityFilterChain filterChain  (HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeHttpRequests().antMatchers("/**").permitAll();
+        httpSecurity.authorizeHttpRequests().antMatchers("/**")
+                .permitAll();
         return httpSecurity.build();
     }
     @Bean //configurações de recursos estaticos (imagens, etc.)
