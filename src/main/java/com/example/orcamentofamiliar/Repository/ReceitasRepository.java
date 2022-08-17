@@ -22,8 +22,6 @@ public interface ReceitasRepository extends JpaRepository <Receitas,Long> {
     @Query("select r from Receitas r where MONTH(r.data) = ?1 and YEAR(r.data) = ?2")
    Page<Receitas> acharDataEMes(int month, int year, Pageable pageable);
 
-
-
     @Query (value = "select sum(r.valor) from Receitas r " +
             "where r.data BETWEEN :firstDay AND :lastDay")
     Optional<BigDecimal> calcularValor (@Param("firstDay") LocalDate firstDay, @Param("lastDay") LocalDate lastDay);

@@ -3,6 +3,7 @@ package com.example.orcamentofamiliar.Repository;
 import com.example.orcamentofamiliar.Controllers.Dtos.CategoriasDto;
 import com.example.orcamentofamiliar.Entidades.Categorias;
 import com.example.orcamentofamiliar.Entidades.Despesas;
+import com.example.orcamentofamiliar.Entidades.Receitas;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,6 +25,7 @@ public interface DespesasRepository  extends JpaRepository<Despesas,Long> {
       @Query("select d from Despesas d where MONTH(d.data) = ?1 and YEAR(d.data) = ?2")
     Page<Despesas> acharPorMesEAno(int month, int year, Pageable pageable);
 
+    Optional <Despesas> findByIdNotAndDescricaoAndDataBetween(Long id, String desc, LocalDate inicioMes, LocalDate fimMes);
 
     @Query (value = "select sum(r.valor) from Despesas r " +
             "where r.data BETWEEN :firstDay AND :lastDay")

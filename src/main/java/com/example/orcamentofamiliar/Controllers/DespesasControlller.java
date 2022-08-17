@@ -29,36 +29,31 @@ public class DespesasControlller {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<DespesasDto> cadastrarDespesas(@RequestBody @Valid DespesasForm despesasForm,
+    public ResponseEntity<?> cadastrarDespesas(@RequestBody @Valid DespesasForm despesasForm,
                                                          UriComponentsBuilder uriComponentsBuilder) {
 
-        Boolean verifica = despesasForm.verifica(despesasRepository);
-        if (!verifica) {
+        if (!despesasForm.isRepeat(despesasRepository)) {
             Despesas despesas = despesasForm.cadastrar();
             despesasRepository.save(despesas);
             URI uri = uriComponentsBuilder.path("/despesas").buildAndExpand(despesas.getId()).toUri();
             return ResponseEntity.created(uri).body(new DespesasDto(despesas));
         }
-        return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("Despesa existente neste mês");
     }
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity<DespesasDto> atualizar(@PathVariable Long id, @RequestBody @Valid AtualizarDespesaForm atualizarDespesaForm) {
+    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody @Valid AtualizarDespesaForm atualizarDespesaForm) {
 
         Optional<Despesas> despesas = despesasRepository.findById(id);
-        Boolean verifica;
-        if (despesas.isPresent()) {
-             verifica =  atualizarDespesaForm.verifica(despesasRepository);
-             if (!verifica) {
-                 atualizarDespesaForm.atualizar(despesasRepository, id);
-                 return ResponseEntity.ok(new DespesasDto(despesas.get()));
-             }else if (verifica){
-                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
-             }
+        if (!despesas.isPresent()) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
-
+        if (atualizarDespesaForm.isRepeated(despesasRepository,id)){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Despesa ja existe nesse mês");
+        }
+            atualizarDespesaForm.atualizar(despesasRepository, id);
+        return ResponseEntity.ok(new DespesasDto(despesas.get()));
     }
     @GetMapping("/{mes}/{ano}")
     public Page<DespesasDto> listarPorData  (@PathVariable int mes , @PathVariable int ano ,
