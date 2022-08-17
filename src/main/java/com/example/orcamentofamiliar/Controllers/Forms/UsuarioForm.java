@@ -28,4 +28,9 @@ public class UsuarioForm {
         String encode = bCryptPasswordEncoder.encode(senha);
         return new Usuario(nome, email, encode);
     }
+    public Boolean isRepeat (UsuarioRepository usuarioRepository) {
+       return usuarioRepository.findByEmail(email).isPresent();
+    }
+
+
 }
