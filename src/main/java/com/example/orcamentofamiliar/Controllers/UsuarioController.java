@@ -23,6 +23,7 @@ public class UsuarioController {
 
     @Autowired
     private PerfilRepository perfilRepository;
+
     @PostMapping
     public ResponseEntity<UsuarioDto> cadastrarUsuario(@RequestBody @Valid UsuarioForm usuarioForm,
                                                        UriComponentsBuilder uriComponentsBuilder)  {
