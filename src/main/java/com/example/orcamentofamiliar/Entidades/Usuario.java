@@ -1,5 +1,6 @@
 package com.example.orcamentofamiliar.Entidades;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -71,4 +72,7 @@ public class Usuario implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+
+
 }

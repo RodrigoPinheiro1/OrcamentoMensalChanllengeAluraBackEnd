@@ -9,10 +9,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
-import java.util.Date;
-import java.util.Optional;
 
 @Getter
 @Setter
@@ -27,23 +24,21 @@ public class ReceitasForm {
     @NotNull
     private LocalDate data;
 
+
+
     public Receitas cadastrar() {
 
         return new Receitas(descricao, valor, data);
     }
 
 
-    public Boolean verifica(ReceitasRepository receitasRepository) {
+    public Boolean isRepeat(ReceitasRepository receitasRepository) {
 
         LocalDate firstDay = data.with(TemporalAdjusters.firstDayOfMonth());
         LocalDate lastDay = data.with(TemporalAdjusters.lastDayOfMonth());
 
-        Optional<Receitas> receitas = receitasRepository.findByDescricaoAndDataBetween(descricao,firstDay,lastDay);
+        return receitasRepository.findByDescricaoAndDataBetween(descricao, firstDay, lastDay).isPresent();
 
-
-        if (receitas.isPresent()){
-            return true;
-        }
-        return false;
     }
+
 }

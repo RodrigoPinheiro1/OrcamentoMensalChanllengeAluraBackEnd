@@ -6,6 +6,7 @@ import com.example.orcamentofamiliar.Controllers.Dtos.Receitas.ReceitasDto;
 import com.example.orcamentofamiliar.Controllers.Forms.Receitas.ReceitasForm;
 import com.example.orcamentofamiliar.Entidades.Receitas;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -28,35 +29,32 @@ public class ReceitaController {
     private ReceitasRepository receitasRepository;
 
     @PostMapping
-    public ResponseEntity<ReceitasDto> cadastrar (@RequestBody @Valid ReceitasForm receitasForm,
+    public ResponseEntity<?> cadastrar (@RequestBody @Valid ReceitasForm receitasForm,
                                                   UriComponentsBuilder uriComponentsBuilder){
 
-        Receitas receitas = receitasForm.cadastrar();
-        Boolean verifica = receitasForm.verifica(receitasRepository);
-        if (!verifica) {
+        if (!receitasForm.isRepeat(receitasRepository)) {
+            Receitas receitas = receitasForm.cadastrar();
             receitasRepository.save(receitas);
             URI uri = uriComponentsBuilder.path("/receitas/{id}").buildAndExpand(receitas.getId()).toUri();
             return ResponseEntity.created(uri).body(new ReceitasDto(receitas));
         }
-        return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("Receita Duplicada");
     }
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity<ReceitasDto> atualizarReceita (@PathVariable Long id, @RequestBody @Valid AtualizarReceitaForm atualizarReceitaForm){
+    public ResponseEntity<?> atualizarReceita (@PathVariable Long id, @RequestBody @Valid AtualizarReceitaForm atualizarReceitaForm){
 
         Optional<Receitas> receitas = receitasRepository.findById(id);
-        Boolean verifica;
-        if (receitas.isPresent()) {
-            verifica = atualizarReceitaForm.verifica(receitasRepository);
-            if (!verifica) {
-                atualizarReceitaForm.atualizar(receitasRepository, id);
-                return ResponseEntity.ok(new ReceitasDto(receitas.get()));
-            } else if (verifica) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
 
-            }
+        if (!receitas.isPresent()){
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.notFound().build();
+
+        if (atualizarReceitaForm.isRepeated(receitasRepository,id)){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Receita Duplicada");
+        }
+        atualizarReceitaForm.atualizar(receitasRepository,id);
+        return ResponseEntity.ok(new ReceitasDto(receitas.get()));
     }
 
     @GetMapping("/{id}")

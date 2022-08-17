@@ -38,19 +38,14 @@ public class AtualizarReceitaForm {
 
         return receitas;
     }
-    public  Boolean
-    verifica(ReceitasRepository receitasRepository) {
+
+    public Boolean isRepeated(ReceitasRepository receitasRepository, Long id) {
 
         LocalDate firstDay = data.with(TemporalAdjusters.firstDayOfMonth());
         LocalDate lastDay = data.with(TemporalAdjusters.lastDayOfMonth());
 
-        Optional<Receitas> receitas = receitasRepository.findByDescricaoAndDataBetween(descricao,firstDay,lastDay);
+        return  receitasRepository.findByIdNotAndDescricaoAndDataBetween(id, descricao,firstDay,lastDay).isPresent();
 
-
-        if (receitas.isPresent()){
-            return true;
-        }
-        return false;
     }
 
 

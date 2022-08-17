@@ -18,17 +18,16 @@ public interface ReceitasRepository extends JpaRepository <Receitas,Long> {
     Page<Receitas> findByDescricao (String desc, Pageable pageable);
 
 
-   Optional <Receitas> findByDescricaoAndDataBetween(String desc, LocalDate inicioMes, LocalDate fimMes);
+   Optional <Receitas> findByIdNotAndDescricaoAndDataBetween(Long id, String desc, LocalDate inicioMes, LocalDate fimMes);
     @Query("select r from Receitas r where MONTH(r.data) = ?1 and YEAR(r.data) = ?2")
    Page<Receitas> acharDataEMes(int month, int year, Pageable pageable);
 
-
-    @Query("select r from Receitas r where MONTH(r.data) = ?1 and YEAR(r.data) = ?2")
-    Optional<Receitas> acharDataEMes(int month, int year);
 
 
     @Query (value = "select sum(r.valor) from Receitas r " +
             "where r.data BETWEEN :firstDay AND :lastDay")
     Optional<BigDecimal> calcularValor (@Param("firstDay") LocalDate firstDay, @Param("lastDay") LocalDate lastDay);
+
+    Optional<Receitas> findByDescricaoAndDataBetween(String descricao, LocalDate firstDay, LocalDate lastDay);
 
 }
