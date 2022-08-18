@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@WithMockUser(username = "teste@gmail.com", authorities = {"USUARIO"}, password = "123456")
 class ReceitaControllerTest {
 
     @Autowired
@@ -59,8 +61,8 @@ class ReceitaControllerTest {
     @Test
     void deveriaDevolver200PassandoIdCorreto() throws Exception {
 
-        URI uri = new URI("/receitas/1");
-        String json = "{\"descricao\":\"descricaoAtu\", \"valor\":\"18\",\"data\":\"2022-02-20\"}";
+        URI uri = new URI("/receitas/4");
+        String json = "{\"descricao\":\"descricaoAtu\", \"valor\":\"18\",\"data\":\"2022-06-20\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put(uri)
                         .content(json)
@@ -71,7 +73,7 @@ class ReceitaControllerTest {
     @Test
     void deveriaDevolverNotFoundIdInfalido() throws Exception {
 
-        URI uri = new URI("/receitas/8");
+        URI uri = new URI("/receitas/651651506216");
         String json = "{\"descricao\":\"descricaoAtu\", \"valor\":\"18\",\"data\":\"2022-02-20\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put(uri)
@@ -83,8 +85,8 @@ class ReceitaControllerTest {
     @Test
     void deveriaDevolverConlflictAtualizacaoComMesmaDescricaoEDataMesmoMes() throws Exception {
 
-        URI uri = new URI("/receitas/1");
-        String json = "{\"descricao\":\"descricaoAtu\", \"valor\":\"18\",\"data\":\"2022-02-20\"}";
+        URI uri = new URI("/receitas/4");
+        String json = "{\"descricao\":\"descricao\", \"valor\":\"18\",\"data\":\"2022-06-20\"}";
 
        mockMvc.perform(MockMvcRequestBuilders.put(uri)
                .content(json)
@@ -96,7 +98,7 @@ class ReceitaControllerTest {
     @Test
     void deveriaDesevolverNotFoundComIdInvalido() throws Exception {
 
-        URI uri = new URI("/receitas/8");
+        URI uri = new URI("/receitas/1656516516516");
 
         mockMvc.perform(MockMvcRequestBuilders.get(uri))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
@@ -104,17 +106,13 @@ class ReceitaControllerTest {
     @Test
     void deveriaBuscarPeloIdEDevolver200PassandoIdCorreto() throws Exception {
 
-        URI uri = new URI("/receitas/2");
+        URI uri = new URI("/receitas/1");
 
         mockMvc.perform(MockMvcRequestBuilders.get(uri))
                 .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
-    @Test
-    void listarTudoOuNome() {
 
-
-    }
     @Test
     void deveriaDevolver404AoDeletar() throws Exception {
         URI uri = new URI("/receitas/654");
@@ -126,7 +124,7 @@ class ReceitaControllerTest {
 
     @Test
     void deveriaDevolver200AoDeletar() throws Exception {
-        URI uri = new URI("/receitas/2");
+        URI uri = new URI("/receitas/5");
 
         mockMvc.perform(MockMvcRequestBuilders.delete(uri))
                 .andExpect(MockMvcResultMatchers.status().isOk());
