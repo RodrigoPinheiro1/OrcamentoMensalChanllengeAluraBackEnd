@@ -3,6 +3,7 @@ package com.example.orcamentofamiliar.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -11,12 +12,13 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @Configuration
 @EnableWebSecurity
-@Profile(value = {"dev"})
+@Profile("prod")
 public class DevSecutiryConfigurations {
 
     @Bean
     protected SecurityFilterChain filterChain  (HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeHttpRequests().antMatchers("/**")
+        httpSecurity.authorizeHttpRequests()
+                .antMatchers("/**")
                 .permitAll();
         return httpSecurity.build();
     }
