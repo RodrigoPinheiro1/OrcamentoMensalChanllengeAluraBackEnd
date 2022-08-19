@@ -52,6 +52,7 @@ public class SecurityConfiguracoes {
                 .antMatchers(HttpMethod.GET,"/receitas/**").hasAuthority("USUARIO")
                 .antMatchers(HttpMethod.DELETE, "receitas/*").hasAuthority("USUARIO")
                 .antMatchers(HttpMethod.PUT,"/usuario/*").hasAuthority("USUARIO")
+                .antMatchers("/swagger-ui/**").permitAll()
                 .anyRequest().authenticated()
                 .and().csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
