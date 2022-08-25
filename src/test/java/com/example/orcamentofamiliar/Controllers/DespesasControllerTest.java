@@ -2,6 +2,7 @@ package com.example.orcamentofamiliar.Controllers;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -23,12 +24,26 @@ class DespesasControllerTest {
     private MockMvc mockMvc;
 
     @Test
+    void deveriaDevolver409AoAtualizarMesmaDescricaoNoMesmoMes() throws Exception {
+        URI uri = new URI("/despesas/1");
+
+        String json = "{\"descricao\":\"alugelD\", \"valor\":\"18\",\"data\":\"2022-06-20\",\"categorias\":\"OUTRAS\" }";
+
+        mockMvc.perform(MockMvcRequestBuilders.put(uri)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(MockMvcResultMatchers.status().isConflict());
+
+    }
+
+
+    @Test
     void deveriaDevolver201AoCadastrar() throws Exception {
 
 
         URI uri = new URI("/despesas");
 
-        String json = "{\"descricao\":\"descricao\",\"valor\":\"18\",\"data\":\"2022-06-20\",\"categorias\":\"OUTRAS\"}";
+        String json = "{\"categorias\":\"OUTRAS\",\"data\":\"2022-10-20\",\"valor\":\"18\",\"descricao\":\"descricaonaorepetida\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post(uri)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -44,8 +59,7 @@ class DespesasControllerTest {
 
         URI uri = new URI("/despesas");
 
-        String json = "{\"descricao\":\"descricao\",\"valor\":\"18\",\"data\":\"2022-06-20\",\"categorias\":\"OUTRAS\"}";
-
+        String json = "{\"descricao\":\"alugelD\", \"valor\":\"18\",\"data\":\"2022-06-20\",\"categorias\":\"OUTRAS\" }";
         mockMvc.perform(MockMvcRequestBuilders.post(uri)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
@@ -55,9 +69,9 @@ class DespesasControllerTest {
 
     @Test
     void deveriaDevolver200AoAtualizarDescricaoEdata() throws Exception {
-        URI uri = new URI("/despesas/3");
+        URI uri = new URI("/despesas/1");
 
-        String json = "{\"descricao\":\"descricaoAtu\",\"valor\":\"18\",\"data\":\"2022-06-20\",\"categorias\":\"OUTRAS\"}";
+        String json = "{\"descricao\":\"atualizacao\",\"valor\":\"18\",\"data\":\"2022-06-20\",\"categorias\":\"SAUDE\"}";
 
 
         mockMvc.perform(MockMvcRequestBuilders.put(uri)
@@ -68,7 +82,7 @@ class DespesasControllerTest {
     }
     @Test
     void deveriaDevolver404AoAtualizarUmIdinvalido() throws Exception {
-        URI uri = new URI("/despesas/8");
+        URI uri = new URI("/despesas/26262");
 
         String json = "{\"descricao\":\"descricaoAtu\",\"valor\":\"18\",\"data\":\"2022-06-20\",\"categorias\":\"OUTRAS\"}";
 
@@ -78,25 +92,13 @@ class DespesasControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
 
     }
-    @Test
-    void deveriaDevolver409AoAtualizarMesmaDescricaoNoMesmoMes() throws Exception {
-        URI uri = new URI("/despesas/3");
-
-        String json = "{\"descricao\":\"descricaoAtu\", \"valor\":\"20\",\"data\":\"2022-05-20\"}";
-
-        mockMvc.perform(MockMvcRequestBuilders.put(uri)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andExpect(MockMvcResultMatchers.status().isConflict());
-
-    }
 
 
 
     @Test
     void deveriaBuscarPorIdEDevolver200() throws Exception {
 
-        URI uri = new URI("/despesas/3");
+        URI uri = new URI("/despesas/1");
         mockMvc.perform(MockMvcRequestBuilders.get(uri))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
@@ -104,7 +106,7 @@ class DespesasControllerTest {
     @Test
     void deveriaDevolver404IdInvalidoAoBuscarId() throws Exception {
 
-        URI uri = new URI("/despesas/8");
+        URI uri = new URI("/despesas/484548");
         mockMvc.perform(MockMvcRequestBuilders.get(uri))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
 
@@ -112,7 +114,7 @@ class DespesasControllerTest {
 
     @Test
     void deveriaExcluirComIdValidoDevolvendo200() throws Exception {
-        URI uri = new URI("/despesas/5");
+        URI uri = new URI("/despesas/3");
         mockMvc.perform(MockMvcRequestBuilders.delete(uri))
                 .andExpect(MockMvcResultMatchers.status().isOk());
 
@@ -120,7 +122,7 @@ class DespesasControllerTest {
 
     @Test
     void deveriaDevolver404IdInvalidoParaExclusao() throws Exception {
-        URI uri = new URI("/despesas/1");
+        URI uri = new URI("/despesas/4815812181");
         mockMvc.perform(MockMvcRequestBuilders.delete(uri))
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
 

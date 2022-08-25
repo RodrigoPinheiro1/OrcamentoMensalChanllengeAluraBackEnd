@@ -25,7 +25,7 @@ class UsuarioControllerTest {
     @Test
     void deveriaDevolver201AoCadastrarUsuario() throws Exception {
 
-        String json = "{\"nome\":\"nome\", \"email\":\"teste@gmail.com\", \"senha\":\"123456\"}";
+        String json = "{\"nome\":\"nome\", \"email\":\"saci2@gmail.com\", \"senha\":\"123456\"}";
         URI uri = new URI("/usuario");
         mockMvc.perform(MockMvcRequestBuilders.post(uri)
                 .content(json).contentType(MediaType.APPLICATION_JSON))
@@ -34,7 +34,7 @@ class UsuarioControllerTest {
     @Test
     void deveriaDevolver409PassandoEmailJaExistente () throws Exception {
 
-        String json = "{\"nome\":\"nome\", \"email\":\"aaaa@gmail.com\", \"senha\":\"123456\"}";
+        String json = "{\"nome\":\"nome\", \"email\":\"teste@gmail.com\", \"senha\":\"123456\"}";
         URI uri = new URI("/usuario");
         mockMvc.perform(MockMvcRequestBuilders.post(uri)
                         .content(json).contentType(MediaType.APPLICATION_JSON))

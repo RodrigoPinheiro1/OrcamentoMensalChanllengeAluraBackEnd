@@ -35,7 +35,7 @@ class ReceitaControllerTest {
 
         URI uri = new URI("/receitas");
 
-        String json = "{\"descricao\":\"descricao\", \"valor\":\"18\",\"data\":\"2022-06-20\"}";
+        String json = "{\"descricao\":\"descricaoAtuaa\", \"valor\":\"18\",\"data\":\"2022-06-20\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post(uri)
                 .content(json)
@@ -49,7 +49,7 @@ class ReceitaControllerTest {
 
         URI uri = new URI("/receitas");
 
-        String json = "{\"descricao\":\"descricao\", \"valor\":\"18\",\"data\":\"2022-02-20\"}";
+        String json = "{\"descricao\":\"aa\", \"valor\":\"18\",\"data\":\"2022-02-20\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.post(uri)
                         .content(json)
@@ -61,8 +61,8 @@ class ReceitaControllerTest {
     @Test
     void deveriaDevolver200PassandoIdCorreto() throws Exception {
 
-        URI uri = new URI("/receitas/4");
-        String json = "{\"descricao\":\"descricaoAtu\", \"valor\":\"18\",\"data\":\"2022-06-20\"}";
+        URI uri = new URI("/receitas/3");
+        String json = "{\"descricao\":\"descricaoAtuaa\", \"valor\":\"18\",\"data\":\"2022-06-20\"}";
 
         mockMvc.perform(MockMvcRequestBuilders.put(uri)
                         .content(json)
@@ -85,8 +85,8 @@ class ReceitaControllerTest {
     @Test
     void deveriaDevolverConlflictAtualizacaoComMesmaDescricaoEDataMesmoMes() throws Exception {
 
-        URI uri = new URI("/receitas/4");
-        String json = "{\"descricao\":\"descricao\", \"valor\":\"18\",\"data\":\"2022-06-20\"}";
+        URI uri = new URI("/receitas/2");
+        String json = "{\"descricao\":\"descricaoAtuaa\", \"valor\":\"18\",\"data\":\"2022-06-20\"}";
 
        mockMvc.perform(MockMvcRequestBuilders.put(uri)
                .content(json)
@@ -106,7 +106,7 @@ class ReceitaControllerTest {
     @Test
     void deveriaBuscarPeloIdEDevolver200PassandoIdCorreto() throws Exception {
 
-        URI uri = new URI("/receitas/1");
+        URI uri = new URI("/receitas/2");
 
         mockMvc.perform(MockMvcRequestBuilders.get(uri))
                 .andExpect(MockMvcResultMatchers.status().isOk());
@@ -124,7 +124,7 @@ class ReceitaControllerTest {
 
     @Test
     void deveriaDevolver200AoDeletar() throws Exception {
-        URI uri = new URI("/receitas/5");
+        URI uri = new URI("/receitas/1");
 
         mockMvc.perform(MockMvcRequestBuilders.delete(uri))
                 .andExpect(MockMvcResultMatchers.status().isOk());
