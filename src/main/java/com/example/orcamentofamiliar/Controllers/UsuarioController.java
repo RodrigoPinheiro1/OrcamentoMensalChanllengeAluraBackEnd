@@ -17,6 +17,7 @@ import java.net.URI;
 
 @RestController
 @RequestMapping("/usuario")
+@Profile(value = {"test","prod","dev"})
 public class UsuarioController {
 
     @Autowired

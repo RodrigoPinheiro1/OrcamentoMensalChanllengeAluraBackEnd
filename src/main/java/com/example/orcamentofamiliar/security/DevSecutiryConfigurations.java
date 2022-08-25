@@ -12,7 +12,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @Configuration
 @EnableWebSecurity
-@Profile("prod")
+@Profile(value = {"dev"})
 public class DevSecutiryConfigurations {
 
     @Bean
