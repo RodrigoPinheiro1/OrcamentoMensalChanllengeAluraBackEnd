@@ -1,11 +1,10 @@
 package com.example.orcamentofamiliar.Controllers;
 
 import com.example.orcamentofamiliar.Controllers.Dtos.Despesas.DespesasDto;
-import com.example.orcamentofamiliar.Controllers.Forms.Despesas.AtualizarDespesaForm;
-import com.example.orcamentofamiliar.Controllers.Forms.Despesas.DespesasForm;
-import com.example.orcamentofamiliar.Entidades.Despesas;
 import com.example.orcamentofamiliar.Repository.DespesasRepository;
+import com.example.orcamentofamiliar.service.DespesaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -18,52 +17,49 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/despesas")
+@Profile(value = {"test", "prod", "dev"})
 public class DespesasControlller {
 
     @Autowired
     private DespesasRepository despesasRepository;
 
+    @Autowired
+    private DespesaService service;
+
     @PostMapping
     @Transactional
-    public ResponseEntity<?> cadastrarDespesas(@RequestBody @Valid DespesasForm despesasForm,
-                                                         UriComponentsBuilder uriComponentsBuilder) {
+    public ResponseEntity<Object> cadastrarDespesas(@RequestBody @Valid DespesasDto despesasDto,
+                                                    UriComponentsBuilder uriComponentsBuilder) {
 
-        if (!despesasForm.isRepeat(despesasRepository)) {
-            Despesas despesas = despesasForm.cadastrar();
-            despesasRepository.save(despesas);
+        if (Boolean.FALSE.equals(service.InsertIsRepeat(despesasDto))) {
+            DespesasDto despesas = service.cadastro(despesasDto);
             URI uri = uriComponentsBuilder.path("/despesas").buildAndExpand(despesas.getId()).toUri();
-            return ResponseEntity.created(uri).body(new DespesasDto(despesas));
+            return ResponseEntity.created(uri).body(despesas);
         }
         return ResponseEntity.status(HttpStatus.CONFLICT).body("Despesa existente neste mês");
     }
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody @Valid AtualizarDespesaForm atualizarDespesaForm) {
+    public ResponseEntity<Object> atualizar(@PathVariable Long id,
+                                            @RequestBody @Valid DespesasDto dto) {
 
-        Optional<Despesas> despesas = despesasRepository.findById(id);
-        if (!despesas.isPresent()) {
-            return ResponseEntity.notFound().build();
-        }
-        if (atualizarDespesaForm.isRepeated(despesasRepository,id)){
+        if (service.UpdateIsRepeated(id, dto)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Despesa ja existe nesse mês");
         }
-            atualizarDespesaForm.atualizar(despesasRepository, id);
-        return ResponseEntity.ok(new DespesasDto(despesas.get()));
+        service.update(dto, id);
+        return ResponseEntity.ok(dto);
     }
+
     @GetMapping("/{mes}/{ano}")
-    public Page<DespesasDto> listarPorData  (@PathVariable int mes , @PathVariable int ano ,
-                                             @PageableDefault(sort = "data"  ,direction = Sort.Direction.ASC
-                                             ,page = 0, size = 10) Pageable pageable){
+    public Page<DespesasDto> listarPorData(@PathVariable int mes, @PathVariable int ano,
+                                           @PageableDefault(sort = "data", direction = Sort.Direction.ASC
+                                                   , page = 0, size = 10) Pageable pageable) {
+        return service.buscarPelaData(mes, ano, pageable);
 
-
-        Page<Despesas> despesas = despesasRepository.acharPorMesEAno(mes, ano, pageable);
-
-        return DespesasDto.converter(despesas);
     }
 
     @GetMapping
@@ -71,39 +67,31 @@ public class DespesasControlller {
     public Page<DespesasDto> listarTudo(@RequestParam(required = false) String descricao,
                                         @PageableDefault(sort = "id", direction = Sort.Direction.DESC,
                                                 page = 0, size = 10) Pageable pageable) {
-        if (descricao == null) {
-            Page<Despesas> despesas = despesasRepository.findAll(pageable);
-            return DespesasDto.converter(despesas);
-        }
-        Page<Despesas> despesas = despesasRepository.findByDescricao(descricao, pageable);
-        return DespesasDto.converter(despesas);
 
+        return service.buscarTudoOuPorNome(descricao, pageable);
     }
 
     @GetMapping("/{id}")
     @Transactional
     public ResponseEntity<DespesasDto> buscarPorId(@PathVariable Long id) {
 
-        Optional<Despesas> despesas = despesasRepository.findById(id);
-        if (despesas.isPresent()) {
-
-            return ResponseEntity.ok(new DespesasDto(despesas.get()));
+        if (service.isFound(id)){
+            DespesasDto dto = service.acharPorId(id);
+            return ResponseEntity.ok(dto);
         }
         return ResponseEntity.notFound().build();
+
     }
 
     @DeleteMapping("/{id}")
     @Transactional
-    public ResponseEntity<?> ExcluirPorId(@PathVariable Long id) {
+    public ResponseEntity<Object> ExcluirPorId(@PathVariable Long id) {
 
-        Optional<Despesas> despesas = despesasRepository.findById(id);
-
-        if (despesas.isPresent()) {
-            despesasRepository.deleteById(id);
-            return ResponseEntity.ok().build();
+        if (service.isFound(id)){
+             service.deletarPorId(id);
+            return ResponseEntity.noContent().build();
         }
-      return ResponseEntity.notFound().build();
-
+        return ResponseEntity.notFound().build();
     }
 
 
