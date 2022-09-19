@@ -1,10 +1,7 @@
 package com.example.orcamentofamiliar.Controllers;
 
-import com.example.orcamentofamiliar.Controllers.Forms.Receitas.AtualizarReceitaForm;
-import com.example.orcamentofamiliar.Repository.ReceitasRepository;
-import com.example.orcamentofamiliar.Controllers.Dtos.Receitas.ReceitasDto;
-import com.example.orcamentofamiliar.Controllers.Forms.Receitas.ReceitasForm;
-import com.example.orcamentofamiliar.Entidades.Receitas;
+import com.example.orcamentofamiliar.Controllers.Dtos.ReceitasDto;
+import com.example.orcamentofamiliar.service.ReceitaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Page;
@@ -19,92 +16,79 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.net.URI;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/receitas")
+@Profile(value = {"test", "prod", "dev"})
 public class ReceitaController {
 
     @Autowired
-    private ReceitasRepository receitasRepository;
+    private ReceitaService service;
 
     @PostMapping
-    public ResponseEntity<?> cadastrar (@RequestBody @Valid ReceitasForm receitasForm,
-                                                  UriComponentsBuilder uriComponentsBuilder){
+    @Transactional
+    public ResponseEntity<Object> cadastrarDespesas(@RequestBody @Valid ReceitasDto dto,
+                                                    UriComponentsBuilder uriComponentsBuilder) {
 
-        if (!receitasForm.isRepeat(receitasRepository)) {
-            Receitas receitas = receitasForm.cadastrar();
-            receitasRepository.save(receitas);
-            URI uri = uriComponentsBuilder.path("/receitas/{id}").buildAndExpand(receitas.getId()).toUri();
-            return ResponseEntity.created(uri).body(new ReceitasDto(receitas));
+        if (Boolean.FALSE.equals(service.InsertIsRepeat(dto))) {
+            ReceitasDto receitas = service.cadastro(dto);
+
+            URI uri = uriComponentsBuilder.path("/receitas").buildAndExpand(receitas.getId()).toUri();
+            return ResponseEntity.created(uri).body(receitas);
         }
-        return ResponseEntity.status(HttpStatus.CONFLICT).body("Receita Duplicada");
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("Despesa existente neste mês");
     }
+
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity<?> atualizarReceita (@PathVariable Long id, @RequestBody @Valid AtualizarReceitaForm atualizarReceitaForm){
+    public ResponseEntity<Object> atualizar(@PathVariable Long id,
+                                            @RequestBody @Valid ReceitasDto dto) {
 
-        Optional<Receitas> receitas = receitasRepository.findById(id);
-
-        if (!receitas.isPresent()){
-            return ResponseEntity.notFound().build();
+        if (service.UpdateIsRepeated(id, dto)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Despesa ja existe nesse mês");
         }
-
-        if (atualizarReceitaForm.isRepeated(receitasRepository,id)){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Receita Duplicada");
-        }
-        atualizarReceitaForm.atualizar(receitasRepository,id);
-        return ResponseEntity.ok(new ReceitasDto(receitas.get()));
+        service.update(dto, id);
+        return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ReceitasDto> buscarPorId (@PathVariable Long id){
+    @GetMapping("/{mes}/{ano}")
+    public Page<ReceitasDto> listarPorData(@PathVariable int mes, @PathVariable int ano,
+                                           @PageableDefault(sort = "data", direction = Sort.Direction.ASC
+                                                   , page = 0, size = 10) Pageable pageable) {
+        return service.buscarPelaData(mes, ano, pageable);
 
-        Optional<Receitas> receitas = receitasRepository.findById(id);
-
-        if (receitas.isPresent()){
-            return ResponseEntity.ok(new ReceitasDto(receitas.get()));
-        }
-        return ResponseEntity.notFound().build();
     }
 
     @GetMapping
-    public Page<ReceitasDto> listarTudoOuNome (@RequestParam (required = false) String descricao,
-                                               @PageableDefault (sort = "id", direction = Sort.Direction.DESC,
-                                                       page = 0, size = 10) Pageable page){
+    @Transactional
+    public Page<ReceitasDto> listarTudo(@RequestParam(required = false) String descricao,
+                                        @PageableDefault(sort = "id", direction = Sort.Direction.DESC,
+                                                page = 0, size = 10) Pageable pageable) {
 
-        if (descricao == null) {
-            Page<Receitas> receitas = receitasRepository.findAll(page);
-            return ReceitasDto.converter(receitas);
-        }
-        Page<Receitas> receitas = receitasRepository.findByDescricao(descricao, page);
-        return ReceitasDto.converter(receitas);
+        return service.buscarTudoOuPorNome(descricao, pageable);
     }
 
+    @GetMapping("/{id}")
+    @Transactional
+    public ResponseEntity<ReceitasDto> buscarPorId(@PathVariable Long id) {
 
-    @GetMapping("/{mes}/{ano}")
-    public Page<ReceitasDto> listarPorAnoEMes(@PathVariable int  ano  , @PathVariable int mes,
-                                              @PageableDefault (sort = "data",direction = Sort.Direction.ASC,
-                                              page = 0, size = 10) Pageable pageable){
-
-        Page<Receitas> receitas = receitasRepository.acharDataEMes(mes,ano,pageable);
-
-        return  ReceitasDto.converter(receitas);
-    }
-
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> Apaga (@PathVariable Long id) {
-
-        Optional<Receitas> receitas = receitasRepository.findById(id);
-
-        if (receitas.isPresent()){
-
-            receitasRepository.deleteById(id);
-            return ResponseEntity.ok().build();
+        if (service.isFound(id)) {
+            ReceitasDto dto = service.acharPorId(id);
+            return ResponseEntity.ok(dto);
         }
         return ResponseEntity.notFound().build();
 
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<Object> ExcluirPorId(@PathVariable Long id) {
+
+        if (service.isFound(id)) {
+            service.deletarPorId(id);
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 
 

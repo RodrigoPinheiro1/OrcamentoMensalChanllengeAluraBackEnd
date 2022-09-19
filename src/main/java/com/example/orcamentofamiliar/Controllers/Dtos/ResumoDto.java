@@ -1,4 +1,4 @@
-package com.example.orcamentofamiliar.Controllers.Dtos.Resumo;
+package com.example.orcamentofamiliar.Controllers.Dtos;
 
 import com.example.orcamentofamiliar.Controllers.Dtos.CategoriasDto;
 import com.example.orcamentofamiliar.Entidades.Categorias;
