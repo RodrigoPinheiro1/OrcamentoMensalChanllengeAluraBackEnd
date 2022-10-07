@@ -13,7 +13,6 @@ import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
-import java.util.Optional;
 
 @Service
 public class DespesaService {
@@ -75,25 +74,31 @@ public class DespesaService {
         despesasRepository.deleteById(id);
     }
 
-    public DespesasDto insertIsRepeat(DespesasDto despesasDto) {
+    public void insertIsRepeat(DespesasDto despesasDto) {
         LocalDate firstDay = despesasDto.getData().with(TemporalAdjusters.firstDayOfMonth());
         LocalDate lastDay = despesasDto.getData().with(TemporalAdjusters.lastDayOfMonth());
 
-        Despesas despesas = despesasRepository.findByDescricaoAndDataBetween(despesasDto.getDescricao(),
-                firstDay, lastDay).orElseThrow(EntityExistsException::new);
+        boolean despesas = despesasRepository.findByDescricaoAndDataBetween(despesasDto.getDescricao(),
+                firstDay, lastDay).isPresent();
 
-        return modelMapper.map(despesas,DespesasDto.class);
+        if (despesas){
+            throw new EntityExistsException();
+        }
+
     }
 
-    public DespesasDto UpdateIsRepeated(Long id, DespesasDto despesasDto) {
+    public void UpdateIsRepeated(Long id, DespesasDto despesasDto) {
 
         LocalDate firstDay = despesasDto.getData().with(TemporalAdjusters.firstDayOfMonth());
         LocalDate lastDay = despesasDto.getData().with(TemporalAdjusters.lastDayOfMonth());
 
-        Despesas despesas = despesasRepository.findByIdNotAndDescricaoAndDataBetween(id, despesasDto.getDescricao(),
-                firstDay, lastDay).orElseThrow(EntityExistsException::new);
+        boolean despesas = despesasRepository.findByIdNotAndDescricaoAndDataBetween(id, despesasDto.getDescricao(),
+                firstDay, lastDay).isPresent();
 
-        return modelMapper.map(despesas,DespesasDto.class);
+        if (despesas){
+            throw new EntityExistsException();
+        }
+
     }
 
 

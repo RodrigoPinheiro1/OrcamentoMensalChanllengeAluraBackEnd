@@ -19,7 +19,6 @@ import java.net.URI;
 
 @RestController
 @RequestMapping("/despesas")
-@Profile(value = {"test", "prod", "dev"})
 public class DespesasControlller {
 
     @Autowired

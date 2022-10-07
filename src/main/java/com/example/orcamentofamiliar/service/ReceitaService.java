@@ -9,10 +9,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
-import java.util.Optional;
 
 @Service
 public class ReceitaService {
@@ -24,19 +24,18 @@ public class ReceitaService {
     private ModelMapper modelMapper;
 
     public ReceitasDto cadastro(ReceitasDto dto) {
-        Receitas receitas = modelMapper.map(dto, Receitas.class);
-        repository.save(receitas);
 
+
+        Receitas receitas = modelMapper.map(dto, Receitas.class);
+        insertIsRepeat(dto);
+        repository.save(receitas);
         return modelMapper.map(receitas, ReceitasDto.class);
     }
 
     public ReceitasDto update(ReceitasDto dto, Long id) {
-        Optional<Receitas> receitas = repository.findById(id);
-        if (!receitas.isPresent()) {
-            throw new EntityNotFoundException();
-        }
-
         Receitas update = repository.getReferenceById(id);
+        acharPorId(id);
+        updateIsRepeated(id, dto);
         update.setDescricao(dto.getDescricao());
         update.setValor(dto.getValor());
 
@@ -61,33 +60,38 @@ public class ReceitaService {
     }
 
     public ReceitasDto acharPorId(Long id) {
-        Optional<Receitas> receitas = repository.findById(id);
+        Receitas receitas = repository.findById(id).orElseThrow(EntityNotFoundException::new);
         return modelMapper.map(receitas, ReceitasDto.class);
-    }
-
-    public Boolean isFound(Long id){
-        return repository.findById(id).isPresent();
     }
 
     public void deletarPorId(Long id) {
         repository.deleteById(id);
     }
-    public Boolean InsertIsRepeat(ReceitasDto dto) {
+
+    public void insertIsRepeat(ReceitasDto dto) {
         LocalDate firstDay = dto.getData().with(TemporalAdjusters.firstDayOfMonth());
         LocalDate lastDay = dto.getData().with(TemporalAdjusters.lastDayOfMonth());
 
-        return repository.findByDescricaoAndDataBetween(dto.getDescricao(), firstDay, lastDay).isPresent();
+        boolean isPresent = repository.findByDescricaoAndDataBetween(dto.getDescricao(), firstDay, lastDay)
+                .isPresent();
+
+        if (isPresent){
+            throw new EntityExistsException();
+        }
+
+
     }
-
-
-    public Boolean UpdateIsRepeated(Long id, ReceitasDto dto) {
+    public void updateIsRepeated(Long id, ReceitasDto dto) {
 
         LocalDate firstDay = dto.getData().with(TemporalAdjusters.firstDayOfMonth());
         LocalDate lastDay = dto.getData().with(TemporalAdjusters.lastDayOfMonth());
 
-        return repository.findByIdNotAndDescricaoAndDataBetween(id, dto.getDescricao(), firstDay, lastDay).isPresent();
+        boolean receitas = repository.findByIdNotAndDescricaoAndDataBetween(id, dto.getDescricao(), firstDay, lastDay)
+                .isPresent();
+        if (receitas){
+            throw new EntityExistsException();
+        }
     }
-
 
 
 }
