@@ -10,9 +10,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
-import javax.validation.ValidationException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,13 +43,13 @@ public class ErroDeValidacaoHandler {
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(EntityNotFoundException.class)
-    public ValidacaoDto productNotFound(EntityNotFoundException e){
-        String message = messageSource.getMessage(e.getMessage(), null, LocaleContextHolder.getLocale());
+    public void productNotFound(){ // nothing to retur
+    }
 
-        return new ValidacaoDto(
-                message,
-                e.getClass().getName()
-        );
+    @ResponseStatus(HttpStatus.CONFLICT)
+    @ExceptionHandler(EntityExistsException.class)
+    public String EntityIsDuplicate (EntityExistsException e) {
+        return "objeto Duplicado";
     }
 
 

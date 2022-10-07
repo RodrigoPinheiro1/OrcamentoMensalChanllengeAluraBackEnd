@@ -1,7 +1,6 @@
 package com.example.orcamentofamiliar.Controllers;
 
-import com.example.orcamentofamiliar.Controllers.Dtos.Despesas.DespesasDto;
-import com.example.orcamentofamiliar.Repository.DespesasRepository;
+import com.example.orcamentofamiliar.Controllers.Dtos.DespesasDto;
 import com.example.orcamentofamiliar.service.DespesaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -24,9 +23,6 @@ import java.net.URI;
 public class DespesasControlller {
 
     @Autowired
-    private DespesasRepository despesasRepository;
-
-    @Autowired
     private DespesaService service;
 
     @PostMapping
@@ -47,9 +43,6 @@ public class DespesasControlller {
     public ResponseEntity<Object> atualizar(@PathVariable Long id,
                                             @RequestBody @Valid DespesasDto dto) {
 
-        if (service.UpdateIsRepeated(id, dto)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Despesa ja existe nesse mês");
-        }
         service.update(dto, id);
         return ResponseEntity.ok(dto);
     }
@@ -75,11 +68,8 @@ public class DespesasControlller {
     @Transactional
     public ResponseEntity<DespesasDto> buscarPorId(@PathVariable Long id) {
 
-        if (service.isFound(id)){
-            DespesasDto dto = service.acharPorId(id);
+            DespesasDto dto = service.isFound(id);
             return ResponseEntity.ok(dto);
-        }
-        return ResponseEntity.notFound().build();
 
     }
 
@@ -87,11 +77,9 @@ public class DespesasControlller {
     @Transactional
     public ResponseEntity<Object> ExcluirPorId(@PathVariable Long id) {
 
-        if (service.isFound(id)){
+
              service.deletarPorId(id);
             return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
     }
 
 
