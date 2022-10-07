@@ -1,9 +1,7 @@
 package com.example.orcamentofamiliar.Repository;
 
 import com.example.orcamentofamiliar.Controllers.Dtos.CategoriasDto;
-import com.example.orcamentofamiliar.Entidades.Categorias;
 import com.example.orcamentofamiliar.Entidades.Despesas;
-import com.example.orcamentofamiliar.Entidades.Receitas;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
