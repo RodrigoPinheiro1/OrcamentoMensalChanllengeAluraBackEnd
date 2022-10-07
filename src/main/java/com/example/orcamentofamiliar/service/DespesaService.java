@@ -1,6 +1,6 @@
 package com.example.orcamentofamiliar.service;
 
-import com.example.orcamentofamiliar.Controllers.Dtos.Despesas.DespesasDto;
+import com.example.orcamentofamiliar.Controllers.Dtos.DespesasDto;
 import com.example.orcamentofamiliar.Entidades.Despesas;
 import com.example.orcamentofamiliar.Repository.DespesasRepository;
 import org.modelmapper.ModelMapper;
@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
@@ -23,23 +24,23 @@ public class DespesaService {
     @Autowired
     private ModelMapper modelMapper;
 
-    public DespesasDto cadastro(DespesasDto despesasDto) {
-        Despesas despesas = modelMapper.map(despesasDto, Despesas.class);
+    public DespesasDto cadastro(DespesasDto dto) {
+
+        insertIsRepeat(dto);
+        Despesas despesas = modelMapper.map(dto, Despesas.class);
         despesasRepository.save(despesas);
 
         return modelMapper.map(despesas, DespesasDto.class);
     }
 
-    public DespesasDto update(DespesasDto despesasDto, Long id) {
-        Optional<Despesas> despesas = despesasRepository.findById(id);
-        if (!despesas.isPresent()) {
-            throw new EntityNotFoundException();
-        }
+    public DespesasDto update(DespesasDto dto, Long id) {
 
+        isFound(id);
+        UpdateIsRepeated(id,dto);
         Despesas update = despesasRepository.getReferenceById(id);
-        update.setDescricao(despesasDto.getDescricao());
-        update.setValor(despesasDto.getValor());
-        update.setCategorias(despesasDto.getCategorias());
+        update.setDescricao(dto.getDescricao());
+        update.setValor(dto.getValor());
+        update.setCategorias(dto.getCategorias());
 
         despesasRepository.save(update);
         return modelMapper.map(update, DespesasDto.class);
@@ -61,32 +62,38 @@ public class DespesaService {
                 .map(despesas -> modelMapper.map(despesas, DespesasDto.class));
     }
 
-    public DespesasDto acharPorId(Long id) {
-        Optional<Despesas> despesas = despesasRepository.findById(id);
+
+    public DespesasDto isFound(Long id) {
+
+        Despesas despesas = despesasRepository
+                .findById(id).orElseThrow(EntityNotFoundException::new);
         return modelMapper.map(despesas, DespesasDto.class);
     }
 
-    public Boolean isFound(Long id){
-        return despesasRepository.findById(id).isPresent();
-    }
-
     public void deletarPorId(Long id) {
-       despesasRepository.deleteById(id);
+        isFound(id);
+        despesasRepository.deleteById(id);
     }
-    public Boolean InsertIsRepeat(DespesasDto despesasDto) {
+
+    public DespesasDto insertIsRepeat(DespesasDto despesasDto) {
         LocalDate firstDay = despesasDto.getData().with(TemporalAdjusters.firstDayOfMonth());
         LocalDate lastDay = despesasDto.getData().with(TemporalAdjusters.lastDayOfMonth());
 
-        return despesasRepository.findByDescricaoAndDataBetween(despesasDto.getDescricao(), firstDay, lastDay).isPresent();
+        Despesas despesas = despesasRepository.findByDescricaoAndDataBetween(despesasDto.getDescricao(),
+                firstDay, lastDay).orElseThrow(EntityExistsException::new);
+
+        return modelMapper.map(despesas,DespesasDto.class);
     }
 
-
-    public Boolean UpdateIsRepeated(Long id, DespesasDto despesasDto) {
+    public DespesasDto UpdateIsRepeated(Long id, DespesasDto despesasDto) {
 
         LocalDate firstDay = despesasDto.getData().with(TemporalAdjusters.firstDayOfMonth());
         LocalDate lastDay = despesasDto.getData().with(TemporalAdjusters.lastDayOfMonth());
 
-        return despesasRepository.findByIdNotAndDescricaoAndDataBetween(id, despesasDto.getDescricao(), firstDay, lastDay).isPresent();
+        Despesas despesas = despesasRepository.findByIdNotAndDescricaoAndDataBetween(id, despesasDto.getDescricao(),
+                firstDay, lastDay).orElseThrow(EntityExistsException::new);
+
+        return modelMapper.map(despesas,DespesasDto.class);
     }
 
 

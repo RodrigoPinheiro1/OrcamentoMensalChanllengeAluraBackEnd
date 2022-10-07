@@ -27,21 +27,17 @@ public class DespesasControlller {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<Object> cadastrarDespesas(@RequestBody @Valid DespesasDto despesasDto,
-                                                    UriComponentsBuilder uriComponentsBuilder) {
-
-        if (Boolean.FALSE.equals(service.InsertIsRepeat(despesasDto))) {
-            DespesasDto despesas = service.cadastro(despesasDto);
-            URI uri = uriComponentsBuilder.path("/despesas").buildAndExpand(despesas.getId()).toUri();
-            return ResponseEntity.created(uri).body(despesas);
-        }
-        return ResponseEntity.status(HttpStatus.CONFLICT).body("Despesa existente neste mês");
+    public ResponseEntity<DespesasDto> cadastrarDespesas(@RequestBody @Valid DespesasDto dto,
+                                                         UriComponentsBuilder uriComponentsBuilder) {
+        DespesasDto despesas = service.cadastro(dto);
+        URI uri = uriComponentsBuilder.path("/despesas").buildAndExpand(despesas.getId()).toUri();
+        return ResponseEntity.created(uri).body(despesas);
     }
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity<Object> atualizar(@PathVariable Long id,
-                                            @RequestBody @Valid DespesasDto dto) {
+    public ResponseEntity<DespesasDto> atualizar(@PathVariable Long id,
+                                                 @RequestBody @Valid DespesasDto dto) {
 
         service.update(dto, id);
         return ResponseEntity.ok(dto);
@@ -68,8 +64,8 @@ public class DespesasControlller {
     @Transactional
     public ResponseEntity<DespesasDto> buscarPorId(@PathVariable Long id) {
 
-            DespesasDto dto = service.isFound(id);
-            return ResponseEntity.ok(dto);
+        DespesasDto dto = service.isFound(id);
+        return ResponseEntity.ok(dto);
 
     }
 
@@ -77,9 +73,8 @@ public class DespesasControlller {
     @Transactional
     public ResponseEntity<Object> ExcluirPorId(@PathVariable Long id) {
 
-
-             service.deletarPorId(id);
-            return ResponseEntity.noContent().build();
+        service.deletarPorId(id);
+        return ResponseEntity.noContent().build();
     }
 
 

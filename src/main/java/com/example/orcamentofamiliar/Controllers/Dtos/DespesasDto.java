@@ -1,16 +1,14 @@
-package com.example.orcamentofamiliar.Controllers.Dtos.Despesas;
+package com.example.orcamentofamiliar.Controllers.Dtos;
 
 import com.example.orcamentofamiliar.Entidades.Categorias;
-import com.example.orcamentofamiliar.Entidades.Despesas;
-import com.example.orcamentofamiliar.Repository.DespesasRepository;
 import lombok.*;
-import org.springframework.data.domain.Page;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
 
 @Getter
 @NoArgsConstructor
@@ -19,12 +17,13 @@ import java.time.temporal.TemporalAdjusters;
 public class DespesasDto {
 
     private Long id;
+    @NotNull
     private String descricao;
-
+    @NotNull
     private BigDecimal valor;
-
+    @NotNull
     private LocalDate data;
-
+    @NotNull
     @Enumerated(EnumType.STRING)
     private Categorias categorias;
 
