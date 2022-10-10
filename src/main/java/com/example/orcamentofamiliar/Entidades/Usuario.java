@@ -27,13 +27,6 @@ public class Usuario implements UserDetails {
     private List<Perfil> perfil = new ArrayList<>();
 
 
-
-    public Usuario(String nome, String email, String senha) {
-        this.nome = nome;
-        this.email = email;
-        this.senha  = senha;
-    }
-
     public Usuario() {
 
     }

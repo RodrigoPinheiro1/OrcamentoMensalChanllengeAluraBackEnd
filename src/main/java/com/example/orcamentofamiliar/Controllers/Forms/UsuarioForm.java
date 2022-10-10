@@ -23,14 +23,8 @@ public class UsuarioForm {
     @NotNull
     private String email;
 
-    public Usuario cadastrar() {
-        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        String encode = bCryptPasswordEncoder.encode(senha);
-        return new Usuario(nome, email, encode);
-    }
-    public Boolean isRepeat (UsuarioRepository usuarioRepository) {
-       return usuarioRepository.findByEmail(email).isPresent();
-    }
+
+
 
 
 }
