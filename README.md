@@ -30,8 +30,9 @@ POST
 
 GET
 /receitas/{mes}/{ano}
-despesas-controlller
 
+
+despesas-controlller
 
 GET
 /despesas/{id}
@@ -50,13 +51,15 @@ POST
 
 GET
 /despesas/{mes}/{ano}
+
+
+Autenticacao 
 usuario-controller
 
 
 POST
 /usuario
 resumo-controller
-
 
 GET
 /resumo/{ano}/{mes}
